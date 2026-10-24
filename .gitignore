@@ -12,8 +12,6 @@ data/*
 !data/README.md
 results/*
 !results/.gitkeep
-*.pth
-*.pt
 
 # OS / editors
 .DS_Store
