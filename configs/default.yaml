@@ -1,0 +1,40 @@
+# Default configuration reproducing the SE-ResNet34 + EGL setup from the thesis.
+# Paths are relative to the repository root.
+
+data:
+  db_dir: data/CPSC_final          # pre-processed windows + meta_data.csv
+  mask_dir: data/CPSC_final/mask   # expert masks: <record>_mask.npz
+  cache: true                      # load all windows into RAM once (~1.6 GB) instead of reading files every epoch
+
+model:
+  num_blocks: [3, 4, 6, 3]         # SE-ResNet34
+  num_classes: 9
+  device: auto                     # auto = cuda > mps (Apple GPU) > cpu
+
+train:
+  seed: 1886
+  n_splits: 5                      # stratified k-fold
+  use_mask: true                   # train with expert masks (EGL)
+  n_mask_train: 400                # masked records added to every training fold, the rest go to validation
+  batch_size: 64
+  num_workers: 4
+  epochs: 100
+  lr: 0.0001
+  weight_decay: 0.0001
+  amp: bf16                        # bfloat16 mixed precision, ~1.4x faster; null = full fp32 (as in the thesis)
+  compile: true                    # torch.compile the backbone, ~1.7x faster after a short warm-up
+  save_dir: results
+  model_name: eagle_seresnet
+
+egl:
+  gain_epoch: 1                    # epoch (1-indexed) from which the explanation loss is enabled; null = never
+  gamma: 10                        # lambda: weight of the explanation loss
+  threshold: 0.4                   # CAM threshold of the soft mask
+  omega: 10                        # sharpness of the soft mask sigmoid
+
+eval:
+  meta_data_path: results/val_fold_1.csv
+  checkpoint: results/eagle_seresnet_fold1.pth
+  batch_size: 128
+  num_workers: 4
+  eval_cam: true                   # also compute Deletion/Insertion AUC of the CAM explanations

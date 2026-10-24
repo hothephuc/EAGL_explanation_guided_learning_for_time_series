@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Data & experiment outputs (download the dataset separately, see data/README.md)
+data/*
+!data/README.md
+results/*
+!results/.gitkeep
+*.pth
+*.pt
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
